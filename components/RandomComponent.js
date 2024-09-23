@@ -1,34 +1,13 @@
-import { Animated, Button, Easing, Image, StyleSheet, Text, View } from 'react-native'
-import React, { useEffect, useRef, useState } from 'react'
+import { Button, StyleSheet, Text, View } from 'react-native'
+import React, { useState } from 'react'
 import DisplayImageComponent from './DisplayImageComponent';
 import { RANDOM_DOG_API_URL } from '../constants/UrlConstants';
 import { TouchableOpacity } from 'react-native';
+import LoaderComponent from './LoaderComponent';
 
 const RandomComponent = () => {
-  // loader
-  const bounceValue = useRef(new Animated.Value(0)).current;
-  useEffect(() => {
-    Animated.loop(
-      Animated.sequence([
-        Animated.timing(bounceValue, {
-          toValue: -20,
-          duration: 50,
-          easing: Easing.linear,
-          useNativeDriver: true,
-        }),
-        Animated.timing(bounceValue, {
-          toValue: 0,
-          duration: 50,
-          easing: Easing.linear,
-          useNativeDriver: true,
-        }),
-      ]),
-    ).start();
-  }, [bounceValue]);
-
   const [isLoading, setIsLoading] = useState(false);
   const [image, setImage] = useState(null)
-  const opacity = isLoading ? 1 : 0;
   const getRandomDom = () => {
     setIsLoading(true)
     return fetch(RANDOM_DOG_API_URL)
@@ -51,15 +30,14 @@ const RandomComponent = () => {
       )
     }
   }
-
+  
   return (
     <View style={styles.container}>
-      <Button title='GENERATE' onPress={() => {getRandomDom()}}/>
+      <TouchableOpacity onPress={() => getRandomDom()} style={styles.button}>
+        <Text style={styles.buttonText}>GENERATE</Text>
+      </TouchableOpacity>
       <View style={styles.imageContainer}>
-        <Animated.Image
-            source={require('../assets/dog.png')}
-            style={[styles.image, {transform: [{translateY: bounceValue}], opacity: opacity}]}
-        />
+        <LoaderComponent opacity={isLoading ? 1 : 0}/>
         {showPicture()}
       </View>
     </View>
@@ -82,9 +60,22 @@ const styles = StyleSheet.create({
     marginTop: 20,
     backgroundColor: '#f0f0f0'
   },
-  image: {
-    width: 200,
-    height: 200,
-    position: 'absolute',
+  button: {
+    padding: 20,
+    backgroundColor: '#fff', // Main background
+    borderStyle: 'solid',
+    borderWidth: 4,           // Outer border width
+    borderColor: '#000',      // Main border color (black)
+    position: 'relative',     // Needed for the pseudo-effect
+    shadowColor: '#000',      // Shadow color
+    shadowOffset: { width: 4, height: 4 }, // Offset shadow to the right and bottom
+    shadowOpacity: 1,         // Opaque shadow
+    shadowRadius: 0,          // No blur, sharp shadow
+  },
+  buttonText: {
+    fontFamily: 'PressStart2P', // Use your custom font
+    fontSize: 16,
+    color: '#000',              // Text color
+    textAlign: 'center',
   }
 })
